@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mt-4">Registros Guardados</h2>
+
+{% if not recolectores_agrupados %}
+  <div class="alert alert-info">No hay registros guardados aún.</div>
+{% else %}
+  {% for nombre_completo, info in recolectores_agrupados.items() %}
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        Recolector: <strong>{{ nombre_completo }}</strong>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th style="width: 160px;">Día</th>
+                <th>Cantidad (kg)</th>
+                <th>Total con Alimentación</th>
+                <th>Total sin Alimentación</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in dias_semana %}
+                {% set fila = info['dias'].get(d, {'cantidad': 0, 'alim': 0, 'no_alim': 0}) %}
+                <tr>
+                  <td>{{ d }}</td>
+                  <td>{{ '%.2f'|format(fila['cantidad']) }}</td>
+                  <td>${{ '%.2f'|format(fila['alim']) }}</td>
+                  <td>${{ '%.2f'|format(fila['no_alim']) }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr class="table-secondary">
+                <th>Total semanal</th>
+                <th>{{ '%.2f'|format(info['total_semanal']) }} kg</th>
+                <th>${{ '%.2f'|format(info['alim_semanal']) }}</th>
+                <th>${{ '%.2f'|format(info['no_alim_semanal']) }}</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h4 class="mb-3">Totales Generales</h4>
+    <p class="mb-1"><strong>Total con Alimentación:</strong> ${{ '%.2f'|format(total_alimentacion) }}</p>
+    <p class="mb-3"><strong>Total sin Alimentación:</strong> ${{ '%.2f'|format(total_no_alimentacion) }}</p>
+
+    <form method="POST" action="{{ url_for('borrar_registros') }}" onsubmit="return confirm('¿Borrar todos los registros?');">
+      <button type="submit" class="btn btn-danger">Borrar registros</button>
+      <a href="{{ url_for('tabla_recolectores') }}" class="btn btn-secondary ms-2">Volver a la tabla</a>
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary ms-2">Inicio</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

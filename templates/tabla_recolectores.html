@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mt-4">Tabla de Recolectores</h2>
+
+<form method="POST" action="{{ url_for('guardar_recolectores') }}">
+    <div class="row mb-3">
+        <div class="col">
+            <label for="precio_alimentacion" class="form-label">Precio kilo alimentación</label>
+            <input type="number" step="0.01" id="precio_alimentacion" name="precio_alimentacion" class="form-control" required>
+        </div>
+        <div class="col">
+            <label for="precio_no_alimentacion" class="form-label">Precio kilo no alimentación</label>
+            <input type="number" step="0.01" id="precio_no_alimentacion" name="precio_no_alimentacion" class="form-control" required>
+        </div>
+    </div>
+
+    <table class="table table-bordered" id="tabla">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Día</th>
+                <th>Cantidad (kg)</th>
+                <th>Total Alimentación</th>
+                <th>Total No Alimentación</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" name="nombre[]" class="form-control" required></td>
+                <td><input type="text" name="apellido[]" class="form-control" required></td>
+                <td>
+                    <select name="dia[]" class="form-select" required>
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miércoles">Miércoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
+                </td>
+                <td><input type="number" step="0.01" name="cantidad_recolectada[]" class="form-control cantidad"></td>
+                <td class="total-alim">0</td>
+                <td class="total-no-alim">0</td>
+                <td><button type="button" class="btn btn-danger btn-sm borrar-fila">X</button></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="table-success fw-bold">
+                <td colspan="3" class="text-end">TOTAL GENERAL:</td>
+                <td id="total-kilos">0</td>
+                <td id="total-alim-general">0</td>
+                <td id="total-no-alim-general">0</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <button type="button" class="btn btn-secondary" id="agregar-fila">Agregar Fila</button>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const tabla = document.querySelector("#tabla tbody");
+    const btnAgregar = document.querySelector("#agregar-fila");
+    const precioAlimInput = document.getElementById("precio_alimentacion");
+    const precioNoAlimInput = document.getElementById("precio_no_alimentacion");
+
+    const totalKilos = document.getElementById("total-kilos");
+    const totalAlimGeneral = document.getElementById("total-alim-general");
+    const totalNoAlimGeneral = document.getElementById("total-no-alim-general");
+
+    // Función para actualizar totales por fila
+    function actualizarTotales(fila) {
+        const cantidad = parseFloat(fila.querySelector(".cantidad").value) || 0;
+        const precioAlim = parseFloat(precioAlimInput.value) || 0;
+        const precioNoAlim = parseFloat(precioNoAlimInput.value) || 0;
+
+        fila.querySelector(".total-alim").textContent = (cantidad * precioAlim).toFixed(2);
+        fila.querySelector(".total-no-alim").textContent = (cantidad * precioNoAlim).toFixed(2);
+
+        actualizarTotalesGenerales();
+    }
+
+    // Función para actualizar el total general
+    function actualizarTotalesGenerales() {
+        let sumaKilos = 0, sumaAlim = 0, sumaNoAlim = 0;
+
+        document.querySelectorAll("#tabla tbody tr").forEach(fila => {
+            const cantidad = parseFloat(fila.querySelector(".cantidad").value) || 0;
+            const alim = parseFloat(fila.querySelector(".total-alim").textContent) || 0;
+            const noAlim = parseFloat(fila.querySelector(".total-no-alim").textContent) || 0;
+
+            sumaKilos += cantidad;
+            sumaAlim += alim;
+            sumaNoAlim += noAlim;
+        });
+
+        totalKilos.textContent = sumaKilos.toFixed(2);
+        totalAlimGeneral.textContent = sumaAlim.toFixed(2);
+        totalNoAlimGeneral.textContent = sumaNoAlim.toFixed(2);
+    }
+
+    // Agregar nueva fila
+    btnAgregar.addEventListener("click", () => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td><input type="text" name="nombre[]" class="form-control" required></td>
+            <td><input type="text" name="apellido[]" class="form-control" required></td>
+            <td>
+                <select name="dia[]" class="form-select" required>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                    <option value="Sábado">Sábado</option>
+                    <option value="Domingo">Domingo</option>
+                </select>
+            </td>
+            <td><input type="number" step="0.01" name="cantidad_recolectada[]" class="form-control cantidad"></td>
+            <td class="total-alim">0</td>
+            <td class="total-no-alim">0</td>
+            <td><button type="button" class="btn btn-danger btn-sm borrar-fila">X</button></td>
+        `;
+        tabla.appendChild(fila);
+    });
+
+    // Eventos delegados
+    tabla.addEventListener("input", (e) => {
+        if (e.target.classList.contains("cantidad")) {
+            actualizarTotales(e.target.closest("tr"));
+        }
+    });
+
+    tabla.addEventListener("click", (e) => {
+        if (e.target.classList.contains("borrar-fila")) {
+            e.target.closest("tr").remove();
+            actualizarTotalesGenerales();
+        }
+    });
+
+    // Recalcular todas las filas cuando cambian los precios
+    [precioAlimInput, precioNoAlimInput].forEach(input => {
+        input.addEventListener("input", () => {
+            document.querySelectorAll("#tabla tbody tr").forEach(fila => {
+                actualizarTotales(fila);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

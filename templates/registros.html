@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mt-4">Registros Guardados</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Recolector</th>
+            <th>Día</th>
+            <th>Cantidad (kg)</th>
+            <th>Total Alimentación</th>
+            <th>Total No Alimentación</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for recolector, registros in recolectores_agrupados.items() %}
+            {% set total_kilos = 0 %}
+            {% set total_alim = 0 %}
+            {% set total_no_alim = 0 %}
+
+            {% for r in registros %}
+                <tr>
+                    <td>{{ recolector }}</td>
+                    <td>{{ r.dia }}</td>
+                    <td>{{ r.cantidad_recolectada }}</td>
+                    <td>{{ "%.2f"|format(r.total_alimentacion) }}</td>
+                    <td>{{ "%.2f"|format(r.total_no_alimentacion) }}</td>
+                </tr>
+                {% set total_kilos = total_kilos + r.cantidad_recolectada %}
+                {% set total_alim = total_alim + r.total_alimentacion %}
+                {% set total_no_alim = total_no_alim + r.total_no_alimentacion %}
+            {% endfor %}
+
+            <!-- Totales por recolector -->
+            <tr class="table-secondary fw-bold">
+                <td colspan="2">TOTAL {{ recolector }}</td>
+                <td>{{ total_kilos }}</td>
+                <td>{{ "%.2f"|format(total_alim) }}</td>
+                <td>{{ "%.2f"|format(total_no_alim) }}</td>
+            </tr>
+        {% endfor %}
+
+        <!-- Totales generales -->
+        <tr class="table-dark fw-bold">
+            <td colspan="2">TOTAL GENERAL</td>
+            <td>{{ total_alimentacion / (precio_alimentacion if precio_alimentacion else 1) }}</td>
+            <td>{{ "%.2f"|format(total_alimentacion) }}</td>
+            <td>{{ "%.2f"|format(total_no_alimentacion) }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

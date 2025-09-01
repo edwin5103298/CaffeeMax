@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="text-center text-success">Resultado del Cálculo</h2>
+
+<ul class="list-group mb-3">
+    <li class="list-group-item">Porcentaje seco: {{ porcentaje_seco }}</li>
+    <li class="list-group-item">Porcentaje verde: {{ porcentaje_verde }}</li>
+    <li class="list-group-item">Porcentaje colorado: {{ porcentaje_colorado }}</li>
+    <li class="list-group-item">Porcentaje colorado seco: {{ porcentaje_colorado_seco }}</li>
+</ul>
+
+<ul class="list-group mb-3">
+    <li class="list-group-item">Valor por kilo seco: {{ valor_seco }}</li>
+    <li class="list-group-item">Valor por kilo verde: {{ valor_verde }}</li>
+    <li class="list-group-item">Valor por kilo colorado: {{ valor_colorado }}</li>
+</ul>
+
+<h4 class="text-end">💰 Total a pagar: <span class="text-success">{{ Precio_total }}</span></h4>
+
+<a href="{{ url_for('index') }}" class="btn btn-primary">Volver</a>
+
+{% endblock %}

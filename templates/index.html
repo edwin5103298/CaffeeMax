@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="text-center text-danger">Bienvenido</h2>
+<p class="text-center">Usa esta aplicación para calcular precios, registrar recolectores y llevar un control de la producción de café.</p>
+
+<form action="{{ url_for('calcular') }}" method="post" class="card p-4 shadow-sm">
+    <div class="mb-3">
+        <label class="form-label">Precio carga café (₡):</label>
+        <input type="number" class="form-control" step="0.01" name="valor_carga_cafe" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Precio kilo alimentación (₡):</label>
+        <input type="number" class="form-control" step="0.01" name="precio_kilo_alimentacion" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Precio kilo no alimentación (₡):</label>
+        <input type="number" class="form-control" step="0.01" name="precio_kilo_no_alimentacion" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Café seco (kg):</label>
+        <input type="number" class="form-control" step="0.01" name="cafe_seco" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Café verde (kg):</label>
+        <input type="number" class="form-control" step="0.01" name="cafe_verde" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Café colorado (kg):</label>
+        <input type="number" class="form-control" step="0.01" name="cafe_colorado" required>
+    </div>
+    <button type="submit" class="btn btn-success w-100">Calcular</button>
+</form>
+
+{% endblock %}
